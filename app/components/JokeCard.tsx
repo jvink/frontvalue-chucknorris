@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Heart, Trash2 } from "lucide-react";
 import type { Joke } from "../types";
@@ -20,16 +20,8 @@ export default function JokeCard({
 }: JokeCardProps) {
   return (
     <div className="shadow-md p-3 flex items-start justify-between [&:not(:last-child)]:border-b border-[#282828]">
-      <div className="flex shrink-0 mr-4">
-        {showDeleteButton ? (
-          <button
-            onClick={onDelete}
-            className="text-red-500 hover:text-red-600 focus:outline-none"
-            aria-label="Delete favorite"
-          >
-            <Trash2 className="h-5 w-5" />
-          </button>
-        ) : (
+      {!showDeleteButton && (
+        <div className="flex shrink-0 mr-4">
           <button
             onClick={onToggleFavorite}
             className="focus:outline-none"
@@ -45,9 +37,18 @@ export default function JokeCard({
               }`}
             />
           </button>
-        )}
-      </div>
+        </div>
+      )}
       <p className="flex-grow">{joke.value}</p>
+      {showDeleteButton && (
+        <button
+          onClick={onDelete}
+          className="ml-4 focus:outline-none"
+          aria-label="Remove from favorites"
+        >
+          <Trash2 className="h-5 w-5 text-red-500" />
+        </button>
+      )}
     </div>
   );
 }
