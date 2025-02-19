@@ -9,19 +9,37 @@ import { useFavorites } from "../context/FavoritesContext";
 
 export default function JokesList({ initialJokes }: { initialJokes: Joke[] }) {
   const [jokes, setJokes] = useState<Joke[]>(initialJokes);
+  const [timerValue, setTimerValue] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let intervalTimerValue: NodeJS.Timeout;
 
     if (isTimerActive) {
-      interval = setInterval(fetchNewJoke, 5000);
+      intervalTimerValue = setInterval(() => {
+        setTimerValue((prev) => prev + 1);
+      }, 1000);
+    }
+
+    // reset timer value when it reaches 5
+    if (timerValue === 5) {
+      setTimerValue(0);
+    }
+
+    return () => clearInterval(intervalTimerValue);
+  }, [timerValue, isTimerActive]);
+
+  useEffect(() => {
+    let intervalTimerActive: NodeJS.Timeout;
+
+    if (isTimerActive) {
+      intervalTimerActive = setInterval(fetchNewJoke, 5000);
     }
 
     return () => {
-      if (interval) {
-        clearInterval(interval);
+      if (intervalTimerActive) {
+        clearInterval(intervalTimerActive);
       }
     };
   }, [isTimerActive]);
@@ -34,6 +52,7 @@ export default function JokesList({ initialJokes }: { initialJokes: Joke[] }) {
 
   const toggleTimer = () => {
     setIsTimerActive((prev) => !prev);
+    setTimerValue(0);
   };
 
   const toggleFavorite = (joke: Joke) => {
@@ -64,6 +83,16 @@ export default function JokesList({ initialJokes }: { initialJokes: Joke[] }) {
         </div>
       </div>
 
+      {isTimerActive && (
+        <div className="relative">
+          <div className="absolute w-full px-2 rounded-full overflow-hidden opacity-50">
+            <div
+              className="h-[1px] transition-all duration-1000 bg-blue-800"
+              style={{ width: timerValue * 25 + "%" }}
+            />
+          </div>
+        </div>
+      )}
       <div className="grid bg-[#0A0A0A] border border-[#282828] rounded-lg">
         {jokes.map((joke) => (
           <JokeCard
